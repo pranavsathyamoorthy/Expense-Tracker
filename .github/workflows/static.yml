@@ -1,43 +1,189 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Personal Expense Tracker</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#172033;--muted:#687386;--line:#e5eaf1;--blue:#315efb;--green:#0d9b70;--red:#d94b55}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font:14px/1.5 Inter,Segoe UI,Arial,sans-serif;color:var(--ink)}
+header{background:linear-gradient(120deg,#172554,#315efb);color:white;padding:26px max(20px,calc((100% - 1200px)/2));}
+header h1{margin:0 0 4px;font-size:25px}header p{margin:0;color:#dbe5ff}
+main{max-width:1200px;margin:22px auto;padding:0 18px}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px;align-items:center}
+button,.btn{border:0;border-radius:9px;padding:10px 14px;font-weight:650;cursor:pointer;background:var(--blue);color:white}
+button.secondary{background:#e9efff;color:#2448c8}button.dark{background:#263449}button.danger{background:#fff0f0;color:#b52e3b}
+button:hover{filter:brightness(.96)}.month{padding:9px;border:1px solid var(--line);border-radius:8px;background:white}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-bottom:18px}
+.tab{background:transparent;color:var(--muted);border-radius:8px 8px 0 0;padding:11px 15px}
+.tab.active{color:var(--blue);background:white;border-bottom:3px solid var(--blue)}
+.panel{display:none}.panel.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:16px;box-shadow:0 2px 8px #15294a08}
+.metric small{color:var(--muted);display:block;margin-bottom:7px}.metric strong{font-size:22px;letter-spacing:-.5px}.metric em{display:block;color:var(--muted);font-size:12px;font-style:normal;margin-top:4px}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:18px 0 12px}.section-head h2{font-size:18px;margin:0}
+.table-wrap{overflow:auto;background:white;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;min-width:760px}th,td{padding:10px 11px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{font-size:12px;color:#58657a;background:#f8faff;position:sticky;top:0}td input{width:92px;padding:7px;border:1px solid #dce3ed;border-radius:7px;text-align:right}
+td input:focus,input:focus{outline:2px solid #b8c8ff;border-color:var(--blue)}
+td.date{font-weight:600}td.total{font-weight:700;color:#1d4ed8}.muted{color:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.barrow{display:grid;grid-template-columns:145px 1fr 100px;gap:10px;align-items:center;margin:12px 0}.track{height:10px;background:#edf1f7;border-radius:20px;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,#315efb,#20b7a0);border-radius:20px}
+.income-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}.field input,.field textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px}
+.notice{background:#eef4ff;color:#2746a8;padding:12px 14px;border-radius:9px;margin:12px 0}.status{font-size:12px;color:var(--green);margin-left:auto}
+footer{text-align:center;color:var(--muted);padding:25px}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}}
+@media(max-width:520px){.grid{grid-template-columns:1fr 1fr}.metric strong{font-size:18px}.income-grid{grid-template-columns:1fr}.barrow{grid-template-columns:105px 1fr 75px;font-size:12px}}
 
-on:
-  # Runs on pushes targeting the default branch
-  push:
-    branches: ["main"]
+.entry-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0}
+.entry-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.entry-form .field.full{grid-column:1/-1}
+.entry-form input,.entry-form select{width:100%;min-width:0;padding:12px;border:1px solid var(--line);border-radius:9px;background:#fff;font:inherit}
+.expense-list{display:grid;gap:9px;margin-top:12px}.expense-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px;background:#fff;border:1px solid var(--line);border-radius:11px}
+.expense-item small{display:block;color:var(--muted)}.expense-item .amount{font-weight:750;white-space:nowrap}.mobile-only{display:none}
+@media(max-width:650px){header{padding:20px 16px}header h1{font-size:21px}main{margin:12px auto;padding:0 12px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.actions label,.status{grid-column:1/-1}.actions .month{width:100%}.actions button{width:100%;padding:11px 7px;font-size:12px}
+.tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;border:0}.tab{border-radius:9px;background:#e9efff;padding:12px 6px;font-size:13px}.tab.active{background:#fff;border:1px solid var(--blue)}
+.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.card{padding:12px}.metric strong{font-size:17px;overflow-wrap:anywhere}.metric small{font-size:11px}
+.two,.income-grid{grid-template-columns:1fr}.barrow{grid-template-columns:95px minmax(30px,1fr) 75px;gap:7px;font-size:11px}
+.table-wrap{display:none}.mobile-only{display:block}.entry-form{grid-template-columns:1fr 1fr}.section-head h2{font-size:17px}footer{padding:18px 10px}}
+@media(max-width:360px){.entry-form{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><h1>Personal Expense Tracker</h1><p>Income, daily spending and monthly financial overview · Offline single-file edition</p></header>
+<main>
+<div class="actions">
+<label class="muted">Tracking month</label><input class="month" id="monthPick" type="month" value="2026-11">
+<button onclick="saveHtml()">Save Updated HTML</button>
+<button class="secondary" onclick="exportCSV()">Export CSV</button>
+<button class="secondary" onclick="document.getElementById('importFile').click()">Import backup</button>
+<input id="importFile" type="file" accept=".json,application/json" hidden onchange="importBackup(event)">
+<button class="dark" onclick="downloadBackup()">Download JSON backup</button>
+<span class="status" id="saveStatus">Autosave enabled in this browser</span>
+</div>
+<div class="tabs">
+<button class="tab active" data-tab="dashboard">Dashboard</button><button class="tab" data-tab="daily">Daily Expenses</button><button class="tab" data-tab="income">Income Tracker</button><button class="tab" data-tab="summary">Monthly Summary</button>
+</div>
+<section class="panel active" id="dashboard">
+<div class="grid" id="metrics"></div>
+<div class="two">
+<div class="card"><div class="section-head"><h2>Spending by category</h2></div><div id="categoryBars"></div></div>
+<div class="card"><div class="section-head"><h2>Financial snapshot</h2></div><div id="snapshot"></div></div>
+</div>
+<div class="card" style="margin-top:14px"><div class="section-head"><h2>Daily spending trend</h2></div><div id="dailyBars"></div></div>
+</section>
+<section class="panel" id="daily">
+<div class="section-head"><h2>Daily expenses</h2><span class="muted">Add and review expenses as you spend.</span></div>
+<div class="entry-card"><h3 style="margin:0 0 12px">＋ Add expense</h3><div class="entry-form">
+<div class="field"><label>Date</label><input id="expenseDate" type="date"></div><div class="field"><label>Category</label><select id="expenseCategory"></select></div>
+<div class="field"><label>Amount (₹)</label><input id="expenseAmount" type="number" min="0" step="0.01" placeholder="0.00"></div>
+<div class="field"><label>Payment method</label><select id="expensePayment"><option>UPI</option><option>Cash</option><option>Card</option><option>Net Banking</option><option>Other</option></select></div>
+<div class="field full"><label>Description</label><input id="expenseNote" placeholder="What did you spend on?"></div>
+<div class="field full"><button style="width:100%" onclick="addExpense()">Add expense</button></div></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="secondary" onclick="addCategory()">＋ Add category</button><button class="secondary" onclick="clearExpenseForm()">Clear</button></div></div>
+<div class="mobile-only"><h3>Expense entries</h3><div id="mobileExpenses" class="expense-list"></div></div><div class="table-wrap"><table id="dailyTable"></table></div>
+</section>
+<section class="panel" id="income">
+<div class="section-head"><h2>Monthly income</h2></div>
+<div class="card">
+<div class="income-grid" id="incomeFields"></div><button class="secondary" style="margin-top:12px" onclick="addIncomeSource()">＋ Add income source</button>
+<div class="notice">Enter your income sources below. Total income, net savings and savings percentage update automatically.</div>
+<div id="incomeSummary"></div>
+</div>
+</section>
+<section class="panel" id="summary">
+<div class="section-head"><h2>Monthly financial summary</h2></div>
+<div class="card"><div id="summaryMetrics" class="grid"></div><h3>Category breakdown</h3><div class="table-wrap"><table id="summaryTable"></table></div></div>
+<div class="card" style="margin-top:14px"><h3>Weekly spending summary</h3><div class="table-wrap"><table id="weeklyTable"></table></div></div>
+</section>
+</main>
+<footer>Standalone HTML · No database · No account or internet required</footer>
+<script id="embedded-data" type="application/json">{"month":"2026-11","expenses":{},"income":[{"name":"Monthly Salary","amount":0,"notes":""},{"name":"Additional Income","amount":0,"notes":""},{"name":"Other Income","amount":0,"notes":""}]}</script>
+<script>
+const defaultCategories=["Food & Groceries","Transportation","Accommodation / Rent","Utilities & Bills","Shopping","Entertainment","Healthcare","Education","Personal Care","Travel","Miscellaneous"];
+let categories=defaultCategories.slice(),state;
+try{state=JSON.parse(document.getElementById('embedded-data').textContent)}catch(e){state={month:new Date().toISOString().slice(0,7),expenses:{},income:[]}}
+state.month ||= new Date().toISOString().slice(0,7);state.categories ||= defaultCategories.slice();state.transactions ||= [];state.income ||= [];categories=state.categories;
+const money=n=>"₹"+(Number(n)||0).toLocaleString("en-IN",{maximumFractionDigits:2});
+const num=v=>Math.max(0,Number(v)||0);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function days(){let [y,m]=state.month.split("-").map(Number);return new Date(y,m,0).getDate()}
+function dateKey(d){return state.month+"-"+String(d).padStart(2,"0")}
+function dayTotal(d){return categories.reduce((s,c)=>s+num(state.expenses[dateKey(d)]?.[c]),0)}
+function totals(){let cat={};categories.forEach(c=>cat[c]=0);let daily=[];for(let d=1;d<=days();d++){let row=state.expenses[dateKey(d)]||{};categories.forEach(c=>cat[c]+=num(row[c]));daily.push(dayTotal(d))}
+let expense=daily.reduce((a,b)=>a+b,0),income=state.income.reduce((s,x)=>s+num(x.amount),0);return {cat,daily,expense,income,net:income-expense,spentDays:daily.filter(x=>x>0).length}}
+function persist(){try{localStorage.setItem("singleFileExpenseTracker",JSON.stringify(state));document.getElementById("saveStatus").textContent="Autosaved in this browser"}catch(e){document.getElementById("saveStatus").textContent="Browser storage unavailable; click Save Updated HTML"}}
+function render(){
+ categories=state.categories||defaultCategories;
+ document.getElementById("monthPick").value=state.month;renderExpenseEntry();
+ let t=totals(),avg=t.expense/days(),pct=t.income?100*t.net/t.income:0;
+ const metric=(label,value,sub="")=>`<div class="card metric"><small>${label}</small><strong>${value}</strong><em>${sub}</em></div>`;
+ document.getElementById("metrics").innerHTML=metric("Total income",money(t.income))+metric("Total expenses",money(t.expense))+metric("Net savings",money(t.net),t.net<0?"Expenses exceed income":"Income minus expenses")+metric("Savings rate",pct.toFixed(1)+"%")+metric("Average daily spend",money(avg));
+ let max=Math.max(1,...Object.values(t.cat));
+ document.getElementById("categoryBars").innerHTML=categories.map(c=>`<div class="barrow"><span>${esc(c)}</span><div class="track"><div class="fill" style="width:${t.cat[c]/max*100}%"></div></div><b>${money(t.cat[c])}</b></div>`).join("");
+ let highest=Math.max(...t.daily),hi=t.daily.indexOf(highest)+1;
+ document.getElementById("snapshot").innerHTML=`<p><b>Days with spending:</b> ${t.spentDays} of ${days()}</p><p><b>Highest spending day:</b> ${highest?dateKey(hi):"—"} · ${money(highest)}</p><p><b>Top category:</b> ${Object.entries(t.cat).sort((a,b)=>b[1]-a[1])[0][1]?esc(Object.entries(t.cat).sort((a,b)=>b[1]-a[1])[0][0]):"No spending yet"}</p><p><b>Financial status:</b> ${t.income===0?"Enter your income":t.net>=0?"Within income":"Overspending"}</p>`;
+ let dmax=Math.max(1,...t.daily);
+ document.getElementById("dailyBars").innerHTML=t.daily.map((v,i)=>`<div class="barrow"><span>${i+1} ${new Date(...state.month.split("-").map(Number).map((x,j)=>j===1?x-1:x),i+1).toLocaleDateString("en-IN",{weekday:"short"})}</span><div class="track"><div class="fill" style="width:${v/dmax*100}%"></div></div><b>${money(v)}</b></div>`).join("");
+ renderDaily(t);renderIncome(t);renderSummary(t);persist();
+}
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+function renderExpenseEntry(){
+ const dateEl=document.getElementById("expenseDate"),sel=document.getElementById("expenseCategory");
+ if(dateEl){dateEl.min=state.month+"-01";dateEl.max=state.month+"-"+String(days()).padStart(2,"0");if(!dateEl.value||!dateEl.value.startsWith(state.month))dateEl.value=state.month+"-01";}
+ if(sel)sel.innerHTML=categories.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
+ const list=(state.transactions||[]).filter(x=>x.date&&x.date.startsWith(state.month)).sort((a,b)=>b.date.localeCompare(a.date));
+ const target=document.getElementById("mobileExpenses");
+ if(target)target.innerHTML=list.length?list.map(x=>`<div class="expense-item"><div><b>${esc(x.note||x.category)}</b><small>${esc(x.date)} · ${esc(x.category)} · ${esc(x.payment||"")}</small></div><div style="text-align:right"><div class="amount">${money(x.amount)}</div><button class="danger" style="padding:5px 9px;margin-top:5px" onclick="deleteExpense('${x.id}')">Delete</button></div></div>`).join(""):'<p class="muted">No individual entries yet. Add your first expense above.</p>';
+}
+function addExpense(){
+ const date=document.getElementById("expenseDate").value,category=document.getElementById("expenseCategory").value,amount=num(document.getElementById("expenseAmount").value),note=document.getElementById("expenseNote").value.trim(),payment=document.getElementById("expensePayment").value;
+ if(!date||!date.startsWith(state.month)||amount<=0){alert("Choose a date in the selected month and enter an amount greater than zero.");return}
+ state.transactions ||= [];state.transactions.push({id:String(Date.now())+Math.random().toString(16).slice(2),date,category,amount,note,payment});
+ if(!state.expenses[date])state.expenses[date]={};state.expenses[date][category]=num(state.expenses[date][category])+amount;
+ document.getElementById("expenseAmount").value="";document.getElementById("expenseNote").value="";render();
+}
+function deleteExpense(id){
+ const idx=(state.transactions||[]).findIndex(x=>x.id===id);if(idx<0)return;
+ const x=state.transactions[idx],key=x.date;if(state.expenses[key])state.expenses[key][x.category]=Math.max(0,num(state.expenses[key][x.category])-num(x.amount));
+ state.transactions.splice(idx,1);render();
+}
+function addCategory(){
+ const name=prompt("Enter a new expense category:");if(!name||!name.trim())return;
+ const clean=name.trim();if(categories.some(c=>c.toLowerCase()===clean.toLowerCase())){alert("This category already exists.");return}
+ state.categories.push(clean);categories=state.categories;render();
+}
+function clearExpenseForm(){["expenseAmount","expenseNote"].forEach(id=>document.getElementById(id).value="");}
+function addIncomeSource(){const name=prompt("Income source name:");if(!name||!name.trim())return;state.income.push({name:name.trim(),amount:0,notes:""});render();}
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
-jobs:
-  # Single deploy job since we're just deploying
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload entire repository
-          path: '.'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
+function renderDaily(t){
+ let head="<thead><tr><th>Date</th><th>Day</th>"+categories.map(c=>`<th>${esc(c)}</th>`).join("")+"<th>Daily total</th></tr></thead>";
+ let body="<tbody>"+Array.from({length:days()},(_,i)=>{let d=i+1,key=dateKey(d),dt=new Date(Number(state.month.slice(0,4)),Number(state.month.slice(5,7))-1,d);return `<tr><td class="date">${key}</td><td>${dt.toLocaleDateString("en-IN",{weekday:"short"})}</td>`+categories.map(c=>`<td><input type="number" min="0" step="0.01" aria-label="${esc(c)} ${key}" value="${state.expenses[key]?.[c]??""}" placeholder="0" oninput="setExpense('${key}', '${esc(c)}',this.value)"></td>`).join("")+`<td class="total">${money(dayTotal(d))}</td></tr>`}).join("")+`<tr><th colspan="2">MONTHLY TOTAL</th>${categories.map(c=>`<th>${money(t.cat[c])}</th>`).join("")}<th>${money(t.expense)}</th></tr></tbody>`;
+ document.getElementById("dailyTable").innerHTML=head+body;
+}
+function setExpense(key,cat,val){if(!state.expenses[key])state.expenses[key]={};state.expenses[key][cat]=num(val);render()}
+function renderIncome(t){
+ document.getElementById("incomeFields").innerHTML=state.income.map((x,i)=>`<div class="field"><label>${esc(x.name)}</label><input type="number" min="0" step="0.01" placeholder="Amount in ₹" value="${x.amount||""}" onchange="state.income[${i}].amount=num(this.value);render()"><input style="margin-top:7px" placeholder="Notes (optional)" value="${esc(x.notes)}" onchange="state.income[${i}].notes=this.value;persist()"></div>`).join("");
+ document.getElementById("incomeSummary").innerHTML=`<p><b>Total monthly income:</b> ${money(t.income)}</p><p><b>Total monthly expenses:</b> ${money(t.expense)}</p><p><b>Net monthly savings:</b> ${money(t.net)}</p><p><b>Savings percentage:</b> ${(t.income?100*t.net/t.income:0).toFixed(1)}%</p>`;
+}
+function renderSummary(t){
+ let m=document.getElementById("summaryMetrics");m.innerHTML=`<div class="card metric"><small>Total income</small><strong>${money(t.income)}</strong></div><div class="card metric"><small>Total expenses</small><strong>${money(t.expense)}</strong></div><div class="card metric"><small>Net savings</small><strong>${money(t.net)}</strong></div><div class="card metric"><small>Average daily expenses</small><strong>${money(t.expense/days())}</strong></div><div class="card metric"><small>Days with spending</small><strong>${t.spentDays}</strong></div>`;
+ document.getElementById("summaryTable").innerHTML="<thead><tr><th>Category</th><th>Total spent</th><th>% of expenses</th><th>Average per day</th><th>Highest single-day entry</th></tr></thead><tbody>"+categories.map(c=>{let high=0;for(let d=1;d<=days();d++)high=Math.max(high,num(state.expenses[dateKey(d)]?.[c]));return `<tr><td>${esc(c)}</td><td>${money(t.cat[c])}</td><td>${(t.expense?100*t.cat[c]/t.expense:0).toFixed(1)}%</td><td>${money(t.cat[c]/days())}</td><td>${money(high)}</td></tr>`}).join("")+`<tr><th>TOTAL</th><th>${money(t.expense)}</th><th>${t.expense? "100.0%":"0.0%"}</th><th>${money(t.expense/days())}</th><th>—</th></tr></tbody>`;
+ let weeks=[];for(let start=1;start<=days();start+=7){let end=Math.min(start+6,days()),sum=0;for(let d=start;d<=end;d++)sum+=dayTotal(d);weeks.push({start,end,sum})}
+ document.getElementById("weeklyTable").innerHTML="<thead><tr><th>Week</th><th>Date range</th><th>Total spent</th><th>% of expenses</th><th>Average per day</th></tr></thead><tbody>"+weeks.map((w,i)=>`<tr><td>Week ${i+1}</td><td>${w.start}–${w.end}</td><td>${money(w.sum)}</td><td>${(t.expense?100*w.sum/t.expense:0).toFixed(1)}%</td><td>${money(w.sum/(w.end-w.start+1))}</td></tr>`).join("")+"</tbody>";
+}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".tab,.panel").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.getElementById(b.dataset.tab).classList.add("active")}));
+document.getElementById("monthPick").addEventListener("change",e=>{state.month=e.target.value||"2026-11";render()});
+function saveHtml(){
+ const copy=document.documentElement.cloneNode(true);
+ copy.querySelector("#embedded-data").textContent=JSON.stringify(state).replace(/</g,"\\u003c");
+ const blob=new Blob(["<!DOCTYPE html>\n"+copy.outerHTML],{type:"text/html;charset=utf-8"});
+ const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="Expense_Tracker_"+state.month+".html";a.click();URL.revokeObjectURL(url);
+ document.getElementById("saveStatus").textContent="Updated HTML file downloaded";
+}
+function downloadBackup(){let b=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download="Expense_Tracker_Backup_"+state.month+".json";a.click();URL.revokeObjectURL(u)}
+function importBackup(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!x.month||!x.expenses||!Array.isArray(x.income))throw Error();state=x;render();alert("Backup imported successfully.")}catch(err){alert("Invalid backup file.")}};r.readAsText(f);e.target.value=""}
+function exportCSV(){let rows=[["Date","Day",...categories,"Daily Total"]];for(let d=1;d<=days();d++){let dt=new Date(Number(state.month.slice(0,4)),Number(state.month.slice(5,7))-1,d);rows.push([dateKey(d),dt.toLocaleDateString("en-IN",{weekday:"long"}),...categories.map(c=>num(state.expenses[dateKey(d)]?.[c])),dayTotal(d)])}let csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(",")).join("\r\n");let u=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"})),a=document.createElement("a");a.href=u;a.download="Expense_Tracker_"+state.month+".csv";a.click();URL.revokeObjectURL(u)}
+// Restore latest browser autosave when available; embedded HTML remains the portable source of truth.
+try{let saved=localStorage.getItem("singleFileExpenseTracker");if(saved){let parsed=JSON.parse(saved);if(parsed.month&&parsed.expenses&&Array.isArray(parsed.income)){state=parsed;state.categories ||= defaultCategories.slice();state.transactions ||= [];categories=state.categories}}}catch(e){}
+render();
+</script>
+</body></html>
